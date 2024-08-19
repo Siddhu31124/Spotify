@@ -193,6 +193,7 @@ function formatTime(seconds) {
 main()
 let index
 let song
+let indexofSong
 let songname=document.getElementById("SongName")
 let songartist=document.getElementById("SongArtist")
 let img=document.getElementById("imageOfPlaybar")
@@ -213,7 +214,18 @@ function time(name){
     songartist.textContent=SongList[index].artist
     mini.textContent=SongList[index].name
 }
-
+function songtime(song1){
+    song1.addEventListener("timeupdate",()=>{
+        presenttime.textContent=formatTime(song1.currentTime)
+        totaltime.textContent=formatTime(song1.duration)
+        presenttime1.textContent=formatTime(song1.currentTime)
+        totaltime1.textContent=formatTime(song1.duration)
+        document.querySelector(".cricle").style.left=(song1.currentTime/song1.duration)*100+"%"})
+        document.querySelector(".seekbar").addEventListener("click",(event)=>{
+            let SongtimePercent=(event.offsetX/event.target.getBoundingClientRect().width)*100
+            document.querySelector(".cricle").style.left=SongtimePercent+"%"
+            song1.currentTime=(song1.duration*SongtimePercent)/100})
+}
 let presenttime=document.querySelector(".currenttime")
 let totaltime=document.querySelector(".duration")
 let presenttime1=document.querySelector(".currenttime1")
@@ -227,6 +239,10 @@ function selectSong(name) {
     if(previousSong!=undefined){
         previousSong.pause();
     }
+    indexofSong=songs.findIndex((items)=>{
+        if(items.toLowerCase().includes(name)){ return true}
+    })
+    console.log(indexofSong)
     for (let i of songs){
         if(i.toLowerCase().includes(name)){
             song = new Audio(i);
@@ -234,16 +250,17 @@ function selectSong(name) {
             song.volume = document.getElementById('volumeControl').value;
             document.getElementById('volumeControl').addEventListener('input', function() {
             song.volume = document.getElementById('volumeControl').value;});
-            song.addEventListener("timeupdate",()=>{
-            presenttime.textContent=formatTime(song.currentTime)
-            totaltime.textContent=formatTime(song.duration)
-            presenttime1.textContent=formatTime(song.currentTime)
-            totaltime1.textContent=formatTime(song.duration)
-            document.querySelector(".cricle").style.left=(song.currentTime/song.duration)*100+"%"})
-            document.querySelector(".seekbar").addEventListener("click",(event)=>{
-                let SongtimePercent=(event.offsetX/event.target.getBoundingClientRect().width)*100
-                document.querySelector(".cricle").style.left=SongtimePercent+"%"
-                song.currentTime=(song.duration*SongtimePercent)/100})
+            songtime(song)
+            // song.addEventListener("timeupdate",()=>{
+            // presenttime.textContent=formatTime(song.currentTime)
+            // totaltime.textContent=formatTime(song.duration)
+            // presenttime1.textContent=formatTime(song.currentTime)
+            // totaltime1.textContent=formatTime(song.duration)
+            // document.querySelector(".cricle").style.left=(song.currentTime/song.duration)*100+"%"})
+            // document.querySelector(".seekbar").addEventListener("click",(event)=>{
+            //     let SongtimePercent=(event.offsetX/event.target.getBoundingClientRect().width)*100
+            //     document.querySelector(".cricle").style.left=SongtimePercent+"%"
+            //     song.currentTime=(song.duration*SongtimePercent)/100})
             previousSong=song
         }
     } 
@@ -278,29 +295,39 @@ document.getElementById("centerid1").addEventListener("click",()=>{
 })
 document.getElementById("rightid").addEventListener("click",()=>{
     if(index<SongList.length-1){
-        console.log(SongList.length)
-        console.log(index)
+        previousSong.pause()
         img.setAttribute("src",SongList[index+1].image)
         img.classList.add("playbarImg")
         songname.textContent=SongList[index+1].name
         songartist.textContent=SongList[index+1].artist
         mini.textContent=SongList[index+1].name
-        song=new Audio(SongList[index+1].image)
+        song=new Audio(songs[indexofSong+1])
         song.play()
+        songtime(song)
+        console.log(indexofSong,index)
+        previousSong=song
         index=index+1  
+        indexofSong=indexofSong+1
     }
     else{
         index=0
+        indexofSong=0
+        previousSong.pause()
         img.setAttribute("src",SongList[index].image)
         img.classList.add("playbarImg")
         songname.textContent=SongList[index].name
         songartist.textContent=SongList[index].artist
         mini.textContent=SongList[index].name 
+        song=new Audio(songs[indexofSong])
+        song.play()
+        songtime(song)
+        previousSong=song
     }
     
     })
 document.getElementById("rightid1").addEventListener("click",()=>{
     if(index<SongList.length-1){
+        previousSong.pause()
         console.log(SongList.length)
         console.log(index)
         img.setAttribute("src",SongList[index+1].image)
@@ -308,56 +335,89 @@ document.getElementById("rightid1").addEventListener("click",()=>{
         songname.textContent=SongList[index+1].name
         songartist.textContent=SongList[index+1].artist
         mini.textContent=SongList[index+1].name
+        index=index+1
+        song=new Audio(songs[indexofSong+1])
+        song.play()
+        songtime(song)
+        previousSong=song
         index=index+1  
+        indexofSong=indexofSong+1  
     }
     else{
         index=0
+        indexofSong=0
+        previousSong.pause()
         img.setAttribute("src",SongList[index].image)
         img.classList.add("playbarImg")
         songname.textContent=SongList[index].name
         songartist.textContent=SongList[index].artist
-        mini.textContent=SongList[index].name 
+        mini.textContent=SongList[index].name
+        song=new Audio(songs[indexofSong])
+        song.play()
+        songtime(song)
+        previousSong=song 
     }
     
     })
     document.getElementById("leftid").addEventListener("click",()=>{
-        if(index>0){
+        if(index>0 && indexofSong>0){
+            console.log(indexofSong)
+            console.log(index)
+            previousSong.pause()
             img.setAttribute("src",SongList[index-1].image)
             img.classList.add("playbarImg")
             songname.textContent=SongList[index-1].name
             songartist.textContent=SongList[index-1].artist
-            mini.textContent=SongList[index-1].name
+            mini.textContent=SongList[index-1].name 
+            song=new Audio(songs[indexofSong-1])
+            song.play()
+            songtime(song)
+            previousSong=song
             index=index-1  
+            indexofSong=indexofSong-1 
         }
         else{
+            console.log("over")
+            previousSong.pause()
             index=SongList.length-1
+            indexofSong=songs.length-1
             img.setAttribute("src",SongList[index].image)
             img.classList.add("playbarImg")
             songname.textContent=SongList[index].name
             songartist.textContent=SongList[index].artist
             mini.textContent=SongList[index].name 
+            song=new Audio(songs[indexofSong])
+            song.play()
+            songtime(song)
+            previousSong=song 
         }
     })
     document.getElementById("leftid1").addEventListener("click",()=>{
         if(index>0){
+            previousSong.pause()
             img.setAttribute("src",SongList[index-1].image)
             img.classList.add("playbarImg")
             songname.textContent=SongList[index-1].name
             songartist.textContent=SongList[index-1].artist
             mini.textContent=SongList[index-1].name
+            song.play()
+            songtime(song)
+            previousSong=song
             index=index-1  
+            indexofSong=indexofSong-1  
         }
         else{
+            previousSong.pause()
             index=SongList.length-1
+            indexofSong=songs.length-1
             img.setAttribute("src",SongList[index].image)
             img.classList.add("playbarImg")
             songname.textContent=SongList[index].name
             songartist.textContent=SongList[index].artist
             mini.textContent=SongList[index].name 
+            song=new Audio(songs[indexofSong])
+            song.play()
+            songtime(song)
+            previousSong=song 
         }
     })
-
-
-
-
-
