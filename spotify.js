@@ -1,7 +1,4 @@
-
-        
-    
-        let SongList=[
+ let SongList=[
     {
         image:"https://i.scdn.co/image/ab67616d0000b2734718e2b124f79258be7bc452",
         name:"StarBoy",
